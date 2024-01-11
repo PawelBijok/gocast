@@ -1,4 +1,4 @@
-package models
+package units
 
 type UnitSystem string
 
@@ -7,21 +7,21 @@ const (
 	Imperial UnitSystem = "imperial"
 )
 
-func (u UnitSystem) getTempUnit() string {
+func (u UnitSystem) GetTempUnit() string {
 	if u == Metric {
 		return "°C"
 	} else {
 		return "°F"
 	}
 }
-func (u UnitSystem) getSpeedUnit() string {
+func (u UnitSystem) GetSpeedUnit() string {
 	if u == Metric {
 		return "km/h"
 	} else {
 		return "mph"
 	}
 }
-func (u UnitSystem) getPressureUnit() string {
+func (u UnitSystem) GetPressureUnit() string {
 	if u == Metric {
 		return "hPa"
 	} else {

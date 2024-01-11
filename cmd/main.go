@@ -6,22 +6,22 @@ import (
 	"log"
 	"os"
 
-	i "github.com/pafello/gocast/init"
-	ss "github.com/pafello/gocast/services/settings_service"
-	sse "github.com/pafello/gocast/services/settings_service/errors"
-	ws "github.com/pafello/gocast/services/weather_service"
-	wsm "github.com/pafello/gocast/services/weather_service/models"
+	initialization "github.com/pafello/gocast/init"
+	"github.com/pafello/gocast/internal/errors"
+	"github.com/pafello/gocast/internal/settings"
+	"github.com/pafello/gocast/internal/units"
+	"github.com/pafello/gocast/internal/weather"
 )
 
 func main() {
-	i.InitEnv()
+	initialization.InitEnv()
 	lat, lng := 49.797417, 18.790270
 
-	settingsService := ss.SettingsService{JsonFilePath: "config.json"}
+	settingsService := settings.SettingsService{JsonFilePath: "config.json"}
 
 	userSettings, err := settingsService.GetUserSettings()
 
-	if err.Error() == sse.FileDoesNotExists {
+	if err.Error() == errors.FileDoesNotExists {
 		fmt.Println("Welcome to GO Cast!")
 		fmt.Print("Specify you location (ex. Los Angeles): ")
 		var ans string
@@ -37,7 +37,7 @@ func main() {
 
 	fmt.Println(userSettings)
 
-	weather, err := ws.GetWeather(lat, lng, wsm.Metric)
+	weather, err := weather.GetWeather(lat, lng, units.Metric)
 
 	if err != nil {
 		fmt.Println("Could not read the weather:", err)

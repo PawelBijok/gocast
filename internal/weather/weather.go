@@ -1,7 +1,9 @@
-package models
+package weather
 
 import (
 	"fmt"
+
+	"github.com/pafello/gocast/internal/units"
 )
 
 type weatherCore struct {
@@ -28,11 +30,11 @@ type Weather struct {
 	Core           weatherCore   `json:"main"`
 	Wind           wind          `json:"wind"`
 	Description    []description `json:"weather"`
-	UnitSystemUsed UnitSystem
+	UnitSystemUsed units.UnitSystem
 }
 
 func (w *Weather) Describe() string {
-	tempUnit := w.UnitSystemUsed.getTempUnit()
+	tempUnit := w.UnitSystemUsed.GetTempUnit()
 
 	descriptions := ""
 	for i, d := range w.Description {
@@ -47,8 +49,8 @@ func (w *Weather) Describe() string {
 }
 
 func (w *Weather) DescribeDetails() string {
-	speedUnit := w.UnitSystemUsed.getSpeedUnit()
-	pressureUnit := w.UnitSystemUsed.getPressureUnit()
+	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
+	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
 
 	return fmt.Sprintf("Humidity: %g%s | Pressure: %g %s | Wind speed: %g %s", w.Core.Humidity, "%", w.Core.Pressure, pressureUnit, w.Wind.Speed, speedUnit)
 

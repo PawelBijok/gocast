@@ -1,4 +1,4 @@
-package models
+package settings
 
 type UserSettings struct {
 	Lat float32 `json:"lat"`
