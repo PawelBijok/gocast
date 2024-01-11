@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	initialization "github.com/pafello/gocast/init"
 	"github.com/pafello/gocast/internal/errors"
@@ -16,7 +17,7 @@ import (
 
 func main() {
 	initialization.InitEnv()
-	lat, lng := 49.797417, 18.790270
+	var lat, lng float64
 
 	settingsService := settings.SettingsService{JsonFilePath: "config.json"}
 
@@ -34,14 +35,28 @@ func main() {
 		}
 		ans = ans[:len(ans)-1]
 		fmt.Println(ans)
-		locations, err := geolocation.GetGeolocationResults(ans)
+		availableLocations, err := geolocation.GetGeolocationResults(ans)
 		if err != nil {
 			fmt.Println("Could not get locations results:", err)
 		}
-		for _, l := range locations {
+		for i, l := range availableLocations {
 
-			fmt.Println(l.Describe())
+			fmt.Printf("%d: %s\n", i+1, l.Describe())
 		}
+		fmt.Print("Select your city (1/2/3): ")
+		ans, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		option, err := strconv.Atoi(ans[:len(ans)-1])
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		selectedResult := availableLocations[option-1]
+		lat, lng = selectedResult.Lat, selectedResult.Lng
 
 	}
 
