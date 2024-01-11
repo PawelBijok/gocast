@@ -1,5 +1,5 @@
 package config
 
 const (
-	WeatherApiKey = "WEATHER_API_KEY"
+	OpenWeatherApiKey = "WEATHER_API_KEY"
 )

@@ -9,11 +9,12 @@ import (
 
 	"github.com/pafello/gocast/config"
 	"github.com/pafello/gocast/internal/units"
+	"github.com/pafello/gocast/internal/utils"
 )
 
 func createWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem) string {
 	latString, lonString := strconv.FormatFloat(lat, 'f', 6, 64), strconv.FormatFloat(lng, 'f', 6, 64)
-	apiKey := os.Getenv(config.WeatherApiKey)
+	apiKey := os.Getenv(config.OpenWeatherApiKey)
 	params := map[string]string{
 		"lat":   latString,
 		"lon":   lonString,
@@ -21,11 +22,7 @@ func createWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem) str
 		"appId": apiKey,
 	}
 	baseUrl := "https://api.openweathermap.org/data/2.5/weather"
-	url := baseUrl + "?"
-	for k, v := range params {
-		url += k + "=" + v + "&"
-	}
-	return url
+	return utils.GenerateUrl(baseUrl, params)
 }
 
 func GetWeather(lat float64, lng float64, unitSystem units.UnitSystem) (Weather, error) {

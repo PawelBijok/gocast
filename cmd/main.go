@@ -8,6 +8,7 @@ import (
 
 	initialization "github.com/pafello/gocast/init"
 	"github.com/pafello/gocast/internal/errors"
+	"github.com/pafello/gocast/internal/geolocation"
 	"github.com/pafello/gocast/internal/settings"
 	"github.com/pafello/gocast/internal/units"
 	"github.com/pafello/gocast/internal/weather"
@@ -31,8 +32,17 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		ans = ans[:len(ans)-1]
 		fmt.Println(ans)
+		locations, err := geolocation.GetGeolocationResults(ans)
+		if err != nil {
+			fmt.Println("Could not get locations results:", err)
+		}
+		for _, l := range locations {
+
+			fmt.Println(l.Describe())
+		}
+
 	}
 
 	fmt.Println(userSettings)
