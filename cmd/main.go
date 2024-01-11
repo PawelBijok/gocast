@@ -34,7 +34,6 @@ func main() {
 			log.Fatal(err)
 		}
 		ans = ans[:len(ans)-1]
-		fmt.Println(ans)
 		availableLocations, err := geolocation.GetGeolocationResults(ans)
 		if err != nil {
 			fmt.Println("Could not get locations results:", err)
