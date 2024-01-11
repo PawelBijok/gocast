@@ -11,10 +11,6 @@ import (
 	"github.com/pafello/gocast/internal/units"
 )
 
-type WeatherService interface {
-	GetWeather(lat float64, lon float64) (Weather, error)
-}
-
 func createWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem) string {
 	latString, lonString := strconv.FormatFloat(lat, 'f', 6, 64), strconv.FormatFloat(lng, 'f', 6, 64)
 	apiKey := os.Getenv(config.WeatherApiKey)
