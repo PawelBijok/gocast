@@ -33,7 +33,7 @@ type Weather struct {
 	UnitSystemUsed units.UnitSystem
 }
 
-func (w *Weather) Describe() string {
+func (w *Weather) Describe(cityName string) string {
 	tempUnit := w.UnitSystemUsed.GetTempUnit()
 
 	descriptions := ""
@@ -44,7 +44,7 @@ func (w *Weather) Describe() string {
 		}
 		descriptions += d.Description + ending
 	}
-	return fmt.Sprintf("It is %g %s (%g %s), %s", w.Core.Temp, tempUnit, w.Core.TempFeelsLike, tempUnit, descriptions)
+	return fmt.Sprintf("%s: %g %s (%g %s), %s", cityName, w.Core.Temp, tempUnit, w.Core.TempFeelsLike, tempUnit, descriptions)
 
 }
 
