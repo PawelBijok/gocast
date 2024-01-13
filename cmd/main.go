@@ -3,18 +3,42 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	initialization "github.com/pafello/gocast/init"
+	"github.com/pafello/gocast/internal/app_mode"
+	"github.com/pafello/gocast/internal/help"
 	"github.com/pafello/gocast/internal/settings"
 	"github.com/pafello/gocast/internal/weather"
 )
 
-func main() {
-	initialization.InitEnv()
+type AppMode string
 
+func main() {
+
+	initialization.InitEnv()
+	args := os.Args
+	var mode app_mode.AppMode
+	if len(args) > 1 {
+		arg := args[1]
+		var err error
+		mode, err = app_mode.AppModeFromString(arg)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else {
+		mode = app_mode.Normal
+	}
+
+	if mode == app_mode.Help {
+
+		help.ShowHelp()
+		return
+	}
 	userSettings, err := settings.GetUserSettings()
 
-	if err != nil {
+	if err != nil || mode == app_mode.ChangePreferences {
 		fmt.Println("Welcome to GO Cast!")
 
 		userSettings, err = settings.InterviewUser()
