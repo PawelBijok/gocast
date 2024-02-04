@@ -1,16 +1,12 @@
 package initialization
 
 import (
-	"log"
-
-	"github.com/joho/godotenv"
+	"os"
 )
 
 func InitEnv() {
-	err := godotenv.Load()
-	if err != nil {
 
-		log.Fatalln("Could not open env file")
+	for key, val := range EnvMap {
+		os.Setenv(key, val)
 	}
-
 }
