@@ -11,12 +11,19 @@ import (
 
 const settingsFilePath = "/go_cast_settings.json"
 
-func getConfigFile() (string, error) {
+func getConfigDirectory() (string, error) {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return dirname + "/.config" + settingsFilePath, nil
+	return dirname + "/.config/gocast", nil
+}
+func getConfigFilePath() (string, error) {
+	dirname, err := getConfigDirectory()
+	if err != nil {
+		return "", err
+	}
+	return dirname + settingsFilePath, nil
 }
 
 func SaveUserSettings(settings UserSettings) error {
@@ -24,15 +31,27 @@ func SaveUserSettings(settings UserSettings) error {
 	if err != nil {
 		return err
 	}
-	filePath, err := getConfigFile()
-	if err != nil {
 
+	filePath, err := getConfigDirectory()
+	if err != nil {
+		fmt.Println("Could not get config directory")
+		return err
+	}
+
+	os.MkdirAll(filePath, 0755)
+	filePath, err = getConfigFilePath()
+	if err != nil {
 		fmt.Println("Could not get config file")
 		return err
 	}
-	err = os.WriteFile(filePath, bytes, 0666)
+
+	file, err := os.Create(filePath)
+
+	_, err = file.Write(bytes)
+
 	if err != nil {
 		fmt.Println("Could not write to file")
+		fmt.Println(err)
 		return err
 	}
 	return nil
@@ -40,22 +59,19 @@ func SaveUserSettings(settings UserSettings) error {
 }
 func GetUserSettings() (UserSettings, error) {
 
-	filePath, err := getConfigFile()
+	filePath, err := getConfigFilePath()
 	if err != nil {
 
-		fmt.Println("Could not get config file")
-		return UserSettings{}, err
+		return UserSettings{}, errors.New(e.FileDoesNotExists)
 	}
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("Could not get file")
 		return UserSettings{}, errors.New(e.FileDoesNotExists)
 	}
 	us := UserSettings{}
 	err = json.Unmarshal(fileBytes, &us)
 
 	if err != nil {
-		fmt.Println("Could not get file")
 		return UserSettings{}, errors.New(e.CantUnmarshalJson)
 	}
 	return us, nil
