@@ -3,20 +3,20 @@ package settings
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 
 	e "github.com/pafello/gocast/internal/errors"
 )
 
 const settingsFilePath = "/go_cast_settings.json"
+const settingsDirectoryPath = "/.config/gocast"
 
 func getConfigDirectory() (string, error) {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return dirname + "/.config/gocast", nil
+	return dirname + settingsDirectoryPath, nil
 }
 func getConfigFilePath() (string, error) {
 	dirname, err := getConfigDirectory()
@@ -29,20 +29,18 @@ func getConfigFilePath() (string, error) {
 func SaveUserSettings(settings UserSettings) error {
 	bytes, err := json.Marshal(settings)
 	if err != nil {
-		return err
+		return errors.New(e.CantMarshalJson)
 	}
 
 	filePath, err := getConfigDirectory()
 	if err != nil {
-		fmt.Println("Could not get config directory")
-		return err
+		return errors.New(e.CantCreateConfigDirectory)
 	}
 
 	os.MkdirAll(filePath, 0755)
 	filePath, err = getConfigFilePath()
 	if err != nil {
-		fmt.Println("Could not get config file")
-		return err
+		return errors.New(e.CantCreateConfigDirectory)
 	}
 
 	file, err := os.Create(filePath)
@@ -50,9 +48,7 @@ func SaveUserSettings(settings UserSettings) error {
 	_, err = file.Write(bytes)
 
 	if err != nil {
-		fmt.Println("Could not write to file")
-		fmt.Println(err)
-		return err
+		return errors.New(e.CanSaveToFile)
 	}
 	return nil
 
