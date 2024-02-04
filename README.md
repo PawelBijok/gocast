@@ -1,6 +1,8 @@
 # GoCast
 ### GoCast is a simple CLI app for displaying current weather
 
+![GoCast demo image](./doc/demo.png)
+
 ## Getting started
 1. Make sure you have [go](https://go.dev/doc/install) installed on your host
 1. Run `go mod download` to install dependencies
