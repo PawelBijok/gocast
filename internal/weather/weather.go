@@ -30,6 +30,7 @@ type Weather struct {
 	Core           weatherCore   `json:"main"`
 	Wind           wind          `json:"wind"`
 	Description    []description `json:"weather"`
+	UnixTimestamp  int64         `json:"dt"`
 	UnitSystemUsed units.UnitSystem
 }
 

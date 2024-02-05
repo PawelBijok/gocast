@@ -2,6 +2,7 @@ package weather
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +13,7 @@ import (
 	"github.com/pafello/gocast/internal/utils"
 )
 
-func createWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem) string {
+func crateOpenWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem, apiCallType apiCallType) string {
 	latString, lonString := strconv.FormatFloat(lat, 'f', 6, 64), strconv.FormatFloat(lng, 'f', 6, 64)
 	apiKey := os.Getenv(config.OpenWeatherApiKey)
 	params := map[string]string{
@@ -21,13 +22,14 @@ func createWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem) str
 		"units": string(unitSystem),
 		"appId": apiKey,
 	}
-	baseUrl := "https://api.openweathermap.org/data/2.5/weather"
+	baseUrl := fmt.Sprintf("https://api.openweathermap.org/data/2.5/%s", string(apiCallType))
+	fmt.Println(baseUrl)
 	return utils.GenerateUrl(baseUrl, params)
 }
 
 func GetWeather(lat float64, lng float64, unitSystem units.UnitSystem) (Weather, error) {
 
-	url := createWeatherUrl(lat, lng, unitSystem)
+	url := crateOpenWeatherUrl(lat, lng, unitSystem, weather)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -46,4 +48,25 @@ func GetWeather(lat float64, lng float64, unitSystem units.UnitSystem) (Weather,
 	}
 	weather.UnitSystemUsed = unitSystem
 	return weather, nil
+}
+
+func GetForecast(lat float64, lng float64, unitSystem units.UnitSystem) (Forecast, error) {
+	url := crateOpenWeatherUrl(lat, lng, unitSystem, forecast)
+
+	res, err := http.Get(url)
+	if err != nil {
+		return Forecast{}, err
+	}
+
+	jsonData, err := io.ReadAll(res.Body)
+	if err != nil {
+		return Forecast{}, err
+	}
+	forecast := Forecast{}
+	err = json.Unmarshal([]byte(jsonData), &forecast)
+	if err != nil {
+		return Forecast{}, err
+	}
+	forecast.UnitSystemUsed = unitSystem
+	return forecast, nil
 }

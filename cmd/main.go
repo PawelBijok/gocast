@@ -54,13 +54,23 @@ func main() {
 		fmt.Println("")
 	}
 
-	weather, err := weather.GetWeather(userSettings.Location.Lat, userSettings.Location.Lng, userSettings.UnitSys)
+	if mode == app_mode.Forecast {
+		_, err := weather.GetForecast(userSettings.Location.Lat, userSettings.Location.Lng, userSettings.UnitSys)
+		if err != nil {
+			fmt.Println("Could not read forecast:", err)
+			return
+		}
 
-	if err != nil {
-		fmt.Println("Could not read the weather:", err)
-		return
+	} else {
+
+		weather, err := weather.GetWeather(userSettings.Location.Lat, userSettings.Location.Lng, userSettings.UnitSys)
+
+		if err != nil {
+			fmt.Println("Could not read the weather:", err)
+			return
+		}
+
+		fmt.Println(weather.Describe(userSettings.Location.Name))
+		fmt.Println(weather.DescribeDetails())
 	}
-
-	fmt.Println(weather.Describe(userSettings.Location.Name))
-	fmt.Println(weather.DescribeDetails())
 }
