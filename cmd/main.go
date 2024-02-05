@@ -55,11 +55,12 @@ func main() {
 	}
 
 	if mode == app_mode.Forecast {
-		_, err := weather.GetForecast(userSettings.Location.Lat, userSettings.Location.Lng, userSettings.UnitSys)
+		forecast, err := weather.GetForecast(userSettings.Location.Lat, userSettings.Location.Lng, userSettings.UnitSys)
 		if err != nil {
 			fmt.Println("Could not read forecast:", err)
 			return
 		}
+		fmt.Println(forecast.Describe(userSettings.Location.Name))
 
 	} else {
 

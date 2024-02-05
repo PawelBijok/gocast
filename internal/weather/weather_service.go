@@ -23,7 +23,6 @@ func crateOpenWeatherUrl(lat float64, lng float64, unitSystem units.UnitSystem, 
 		"appId": apiKey,
 	}
 	baseUrl := fmt.Sprintf("https://api.openweathermap.org/data/2.5/%s", string(apiCallType))
-	fmt.Println(baseUrl)
 	return utils.GenerateUrl(baseUrl, params)
 }
 
