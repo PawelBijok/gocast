@@ -1,6 +1,10 @@
 package weather
 
-import "github.com/pafello/gocast/internal/units"
+import (
+	"fmt"
+
+	"github.com/pafello/gocast/internal/units"
+)
 
 type Forecast struct {
 	List           []Weather `json:"list"`
@@ -8,9 +12,11 @@ type Forecast struct {
 }
 
 func (f *Forecast) Describe(cityName string) string {
-	desc := ""
+	desc := fmt.Sprintf("%s\n", cityName)
+
 	for _, weather := range f.List {
-		desc += weather.Describe(cityName)
+		desc += weather.DescribeShort()
+		desc += "\n"
 	}
 	return desc
 }

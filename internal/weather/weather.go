@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pafello/gocast/internal/units"
+	"github.com/pafello/gocast/internal/utils"
 )
 
 type weatherCore struct {
@@ -46,6 +47,18 @@ func (w *Weather) Describe(cityName string) string {
 		descriptions += d.Description + ending
 	}
 	return fmt.Sprintf("%s: %g %s (%g %s), %s", cityName, w.Core.Temp, tempUnit, w.Core.TempFeelsLike, tempUnit, descriptions)
+
+}
+
+func (w *Weather) DescribeShort() string {
+	tempUnit := w.UnitSystemUsed.GetTempUnit()
+	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
+	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
+	temp := utils.LeftPad(fmt.Sprintf("%g %s", w.Core.Temp, tempUnit), 10)
+	pressure := utils.LeftPad(fmt.Sprintf("%g %s", w.Core.Pressure, pressureUnit), 8)
+	wind := utils.LeftPad(fmt.Sprintf("%g %s", w.Wind.Speed, speedUnit), 8)
+
+	return fmt.Sprintf("%s | %s | %s", temp, pressure, wind)
 
 }
 
