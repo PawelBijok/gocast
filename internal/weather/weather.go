@@ -2,6 +2,7 @@ package weather
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pafello/gocast/internal/units"
 	"github.com/pafello/gocast/internal/utils"
@@ -35,6 +36,8 @@ type Weather struct {
 	UnitSystemUsed units.UnitSystem
 }
 
+type WeatherSeries []*Weather
+
 func (w *Weather) Describe(cityName string) string {
 	tempUnit := w.UnitSystemUsed.GetTempUnit()
 
@@ -58,7 +61,8 @@ func (w *Weather) DescribeShort() string {
 	pressure := utils.LeftPad(fmt.Sprintf("%g %s", w.Core.Pressure, pressureUnit), 8)
 	wind := utils.LeftPad(fmt.Sprintf("%g %s", w.Wind.Speed, speedUnit), 8)
 
-	return fmt.Sprintf("%s | %s | %s", temp, pressure, wind)
+	time := utils.FormatTime(time.Unix(w.UnixTimestamp, 0))
+	return fmt.Sprintf("%s: %s | %s | %s", time, temp, pressure, wind)
 
 }
 
@@ -68,4 +72,18 @@ func (w *Weather) DescribeDetails() string {
 
 	return fmt.Sprintf("Humidity: %g%s | Pressure: %g %s | Wind speed: %g %s", w.Core.Humidity, "%", w.Core.Pressure, pressureUnit, w.Wind.Speed, speedUnit)
 
+}
+
+func (ws WeatherSeries) GetAverageWeather() Weather {
+	seriesQuantity := len(ws)
+	var avgTemp float32 = 0
+	for i := 0; i < seriesQuantity; i++ {
+
+		w := ws[i]
+		avgTemp += (w.Core.Temp)
+	}
+	avgTemp /= float32(seriesQuantity)
+	avgWeather := ws[0]
+	avgWeather.Core.Temp = avgTemp
+	return *avgWeather
 }

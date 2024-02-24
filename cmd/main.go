@@ -60,7 +60,8 @@ func main() {
 			fmt.Println("Could not read forecast:", err)
 			return
 		}
-		fmt.Println(forecast.Describe(userSettings.Location.Name))
+		groups := forecast.GroupWeatherByDay()
+		groups.DescribeDaily()
 
 	} else {
 
