@@ -2,7 +2,6 @@ package weather
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/pafello/gocast/internal/units"
 	"github.com/pafello/gocast/internal/utils"
@@ -57,12 +56,11 @@ func (w *Weather) DescribeShort() string {
 	tempUnit := w.UnitSystemUsed.GetTempUnit()
 	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
 	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
-	temp := utils.LeftPad(fmt.Sprintf("%g %s", w.Core.Temp, tempUnit), 10)
-	pressure := utils.LeftPad(fmt.Sprintf("%g %s", w.Core.Pressure, pressureUnit), 8)
-	wind := utils.LeftPad(fmt.Sprintf("%g %s", w.Wind.Speed, speedUnit), 8)
+	temp := utils.LeftPad(fmt.Sprintf("%.2f %s", w.Core.Temp, tempUnit), 10)
+	pressure := utils.LeftPad(fmt.Sprintf("%.2f %s", w.Core.Pressure, pressureUnit), 8)
+	wind := utils.LeftPad(fmt.Sprintf("%.2f %s", w.Wind.Speed, speedUnit), 8)
 
-	time := utils.FormatTime(time.Unix(w.UnixTimestamp, 0))
-	return fmt.Sprintf("%s: %s | %s | %s", time, temp, pressure, wind)
+	return fmt.Sprintf(" %s | %s | %s", temp, pressure, wind)
 
 }
 

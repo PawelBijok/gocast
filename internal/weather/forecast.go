@@ -47,6 +47,7 @@ func (gf *GroupedForecast) DescribeDaily() {
 		avgWeather := val.GetAverageWeather()
 
 		avgWeatherPerDay[key] = avgWeather
-		fmt.Println(avgWeather.DescribeShort())
+
+		fmt.Printf("%s: %s\n", key, avgWeather.DescribeShort())
 	}
 }
