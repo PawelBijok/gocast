@@ -77,13 +77,23 @@ func (w *Weather) DescribeDetails() string {
 func (ws WeatherSeries) GetAverageWeather() Weather {
 	seriesQuantity := len(ws)
 	var avgTemp float32 = 0
+	var avgPressure float32 = 0
+	var avgWindSpeed float32 = 0
+
 	for i := 0; i < seriesQuantity; i++ {
 
 		w := ws[i]
 		avgTemp += (w.Core.Temp)
+		avgPressure += w.Core.Pressure
+		avgWindSpeed += w.Wind.Speed
 	}
 	avgTemp /= float32(seriesQuantity)
+	avgPressure /= float32(seriesQuantity)
+	avgWindSpeed /= float32(seriesQuantity)
 	avgWeather := ws[0]
 	avgWeather.Core.Temp = avgTemp
+	avgWeather.Core.Pressure = avgPressure
+	avgWeather.Wind.Speed = avgWindSpeed
+
 	return *avgWeather
 }
