@@ -30,6 +30,7 @@ func (f *Forecast) GroupWeatherByDay() GroupedForecast {
 
 	groups := make(GroupedForecast)
 	for _, w := range f.List {
+		w.UnitSystemUsed = f.UnitSystemUsed
 		dayMonth := utils.FormatTimeDayMonth(time.Unix(w.UnixTimestamp, 0))
 
 		groups[dayMonth] = append(groups[dayMonth], &w)
@@ -44,6 +45,7 @@ func (gf *GroupedForecast) DescribeDaily() {
 
 	for key, val := range *gf {
 		avgWeather := val.GetAverageWeather()
+
 		avgWeatherPerDay[key] = avgWeather
 		fmt.Println(avgWeather.DescribeShort())
 	}
