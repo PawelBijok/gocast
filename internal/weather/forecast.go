@@ -2,13 +2,14 @@ package weather
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/pafello/gocast/internal/units"
 	"github.com/pafello/gocast/internal/utils"
 )
 
-type GroupedForecast map[string]WeatherSeries
+type GroupedForecast map[time.Time]WeatherSeries
 
 type Forecast struct {
 	List           []Weather `json:"list"`
@@ -31,9 +32,14 @@ func (f *Forecast) GroupWeatherByDay() GroupedForecast {
 	groups := make(GroupedForecast)
 	for _, w := range f.List {
 		w.UnitSystemUsed = f.UnitSystemUsed
-		dayMonth := utils.FormatTimeDayMonth(time.Unix(w.UnixTimestamp, 0))
 
-		groups[dayMonth] = append(groups[dayMonth], &w)
+		dayMonth := utils.FormatTimeDayMonthYear(time.Unix(w.UnixTimestamp, 0))
+		date, err := time.Parse(utils.DayMonthYearLayout, dayMonth)
+		if err != nil {
+			continue
+		}
+
+		groups[date] = append(groups[date], &w)
 
 	}
 
@@ -41,13 +47,28 @@ func (f *Forecast) GroupWeatherByDay() GroupedForecast {
 }
 
 func (gf *GroupedForecast) DescribeDaily() {
-	avgWeatherPerDay := make(map[string]Weather)
+	avgWeatherPerDay := make(map[time.Time]Weather)
 
 	for key, val := range *gf {
 		avgWeather := val.GetAverageWeather()
-
 		avgWeatherPerDay[key] = avgWeather
-
-		fmt.Printf("%s: %s\n", key, avgWeather.DescribeShort())
 	}
+
+	sortedKeys := []time.Time{}
+
+	for key := range avgWeatherPerDay {
+		sortedKeys = append(sortedKeys, key)
+	}
+
+	sort.Slice(sortedKeys, func(i, j int) bool {
+		d1, d2 := sortedKeys[i], sortedKeys[j]
+		return d1.Before(d2)
+	})
+
+	for _, item := range sortedKeys {
+		weather := avgWeatherPerDay[item]
+
+		fmt.Printf("%s: %s\n", utils.FormatTimeDayMonth(item), weather.DescribeShort())
+	}
+
 }

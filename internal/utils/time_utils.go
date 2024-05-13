@@ -8,6 +8,12 @@ func FormatTime(t time.Time) string {
 
 }
 
+const DayMonthYearLayout = "_2 Jan 2006"
+const DayMonthLayout = "_2 Jan"
+
+func FormatTimeDayMonthYear(t time.Time) string {
+	return t.Format(DayMonthYearLayout)
+}
 func FormatTimeDayMonth(t time.Time) string {
-	return t.Format("_2 Jan")
+	return t.Format(DayMonthLayout)
 }
