@@ -7,7 +7,7 @@ type AppMode string
 const (
 	Help              AppMode = "help"
 	ChangePreferences AppMode = "prefs"
-	Normal            AppMode = "normal"
+	Current           AppMode = "current"
 	Forecast          AppMode = "forecast"
 )
 
@@ -17,8 +17,8 @@ func AppModeFromString(s string) (AppMode, error) {
 		return Help, nil
 	case string(ChangePreferences):
 		return ChangePreferences, nil
-	case string(Normal):
-		return Normal, nil
+	case string(Current):
+		return Current, nil
 	case string(Forecast):
 		return Forecast, nil
 	}

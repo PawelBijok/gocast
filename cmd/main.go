@@ -29,7 +29,7 @@ func main() {
 		}
 
 	} else {
-		mode = app_mode.Normal
+		mode = app_mode.Current
 	}
 
 	if mode == app_mode.Help {
