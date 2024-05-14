@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	initialization "github.com/pafello/gocast/init"
 	"github.com/pafello/gocast/internal/app_mode"
@@ -61,6 +62,14 @@ func main() {
 			return
 		}
 		groups := forecast.GroupWeatherByDay()
+		now := time.Now()
+
+		for key, _ := range groups {
+			if key.Before(now) {
+				delete(groups, key)
+			}
+
+		}
 		groups.DescribeDaily()
 
 	} else {

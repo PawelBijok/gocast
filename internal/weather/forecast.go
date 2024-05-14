@@ -47,7 +47,7 @@ func (f *Forecast) GroupWeatherByDay() GroupedForecast {
 }
 
 func (gf *GroupedForecast) DescribeDaily() {
-	avgWeatherPerDay := make(map[time.Time]Weather)
+	avgWeatherPerDay := make(map[time.Time]AvgDayWeather)
 
 	for key, val := range *gf {
 		avgWeather := val.GetAverageWeather()

@@ -34,6 +34,26 @@ type Weather struct {
 	UnixTimestamp  int64         `json:"dt"`
 	UnitSystemUsed units.UnitSystem
 }
+type AvgDayWeather struct {
+	TempLo         float32
+	TempHi         float32
+	Pressure       float32
+	WindSpeed      float32
+	UnitSystemUsed units.UnitSystem
+}
+
+func (w *AvgDayWeather) DescribeShort() string {
+	tempUnit := w.UnitSystemUsed.GetTempUnit()
+	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
+	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
+	tempLo := utils.LeftPad(fmt.Sprintf("%.2f %s", w.TempLo, tempUnit), 9)
+	tempHi := utils.LeftPad(fmt.Sprintf("%.2f %s", w.TempHi, tempUnit), 9)
+	pressure := utils.LeftPad(fmt.Sprintf("%.2f %s", w.Pressure, pressureUnit), 8)
+	wind := utils.LeftPad(fmt.Sprintf("%.2f %s", w.WindSpeed, speedUnit), 8)
+
+	return fmt.Sprintf(" %s - %s  | %s | %s", tempLo, tempHi, pressure, wind)
+
+}
 
 type WeatherSeries []*Weather
 
@@ -72,26 +92,33 @@ func (w *Weather) DescribeDetails() string {
 
 }
 
-func (ws WeatherSeries) GetAverageWeather() Weather {
+func (ws WeatherSeries) GetAverageWeather() AvgDayWeather {
 	seriesQuantity := len(ws)
 	var avgTemp float32 = 0
+	var avgTempNight float32 = 0
 	var avgPressure float32 = 0
 	var avgWindSpeed float32 = 0
+	var tempLo float32 = 1000
+	var tempHi float32 = -1000
 
 	for i := 0; i < seriesQuantity; i++ {
 
 		w := ws[i]
-		avgTemp += (w.Core.Temp)
+		if w.Core.Temp > tempHi {
+			tempHi = w.Core.Temp
+		}
+		if w.Core.Temp < tempLo {
+			tempLo = w.Core.Temp
+		}
 		avgPressure += w.Core.Pressure
 		avgWindSpeed += w.Wind.Speed
 	}
 	avgTemp /= float32(seriesQuantity)
+	avgTempNight /= float32(seriesQuantity)
 	avgPressure /= float32(seriesQuantity)
 	avgWindSpeed /= float32(seriesQuantity)
-	avgWeather := ws[0]
-	avgWeather.Core.Temp = avgTemp
-	avgWeather.Core.Pressure = avgPressure
-	avgWeather.Wind.Speed = avgWindSpeed
 
-	return *avgWeather
+	avgWeather := AvgDayWeather{Pressure: avgPressure, WindSpeed: avgWindSpeed, UnitSystemUsed: ws[0].UnitSystemUsed, TempLo: tempLo, TempHi: tempHi}
+
+	return avgWeather
 }
