@@ -64,7 +64,7 @@ func main() {
 		groups := forecast.GroupWeatherByDay()
 		now := time.Now()
 
-		for key, _ := range groups {
+		for key := range groups {
 			if key.Before(now) {
 				delete(groups, key)
 			}
