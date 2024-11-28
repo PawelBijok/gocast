@@ -76,12 +76,12 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentStep = 4
 				return m, tea.Quit
 
-			case "up", "k":
+			case "up", "k", "ctrl+p":
 				if m.cursor > 0 {
 					m.cursor--
 				}
 
-			case "down", "j":
+			case "down", "j", "ctrl+n":
 				if m.cursor < len(m.locationChoices)-1 {
 					m.cursor++
 				}
@@ -100,12 +100,12 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentStep = 4
 				return m, tea.Quit
 
-			case "up", "k":
+			case "up", "k", "ctrl+p":
 				if m.cursor > 0 {
 					m.cursor--
 				}
 
-			case "down", "j":
+			case "down", "j", "ctrl+n":
 				if m.cursor < len(m.unitChoices)-1 {
 					m.cursor++
 				}
@@ -144,9 +144,9 @@ func (m interviewModel) View() string {
 			t := ""
 			if m.cursor == i {
 				cursor = "•"
-				t = styles.SelectedOption.Render(c.Describe())
+				t = styles.SelectedOption.Render(c.DisplayDescribe())
 			} else {
-				t = c.Describe()
+				t = c.DisplayDescribe()
 			}
 			s += fmt.Sprintf("%s %s\n", cursor, t)
 		}

@@ -10,7 +10,7 @@ type GeolocationResult struct {
 	State   string  `json:"state"`
 }
 
-func (g *GeolocationResult) Describe() string {
+func (g *GeolocationResult) DisplayDescribe() string {
 
 	return fmt.Sprintf("%s (%s, %s)", g.Name, g.Country, g.State)
 

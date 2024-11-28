@@ -10,6 +10,7 @@ import (
 	"github.com/pafello/gocast/internal/app_mode"
 	"github.com/pafello/gocast/internal/help"
 	"github.com/pafello/gocast/internal/settings"
+	"github.com/pafello/gocast/internal/styles"
 	"github.com/pafello/gocast/internal/weather"
 )
 
@@ -71,7 +72,8 @@ func main() {
 			}
 
 		}
-		groups.DescribeDaily()
+		fmt.Println(styles.HeaderText.Render(userSettings.Location.DisplayDescribe()))
+		groups.DisplayDailyTable()
 
 	} else {
 
