@@ -71,7 +71,9 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if m.currentStep == 1 {
 			switch msg.String() {
-			case "esc", "crtl+c":
+			case "esc", "ctrl+c":
+
+				m.currentStep = 4
 				return m, tea.Quit
 
 			case "up", "k":
@@ -130,36 +132,44 @@ func (m interviewModel) View() string {
 		s += styles.HeaderBox.Render("Welcome to Go Cast!") + "\n"
 	}
 	if len(m.steps[m.currentStep]) > 0 {
-		s += styles.Subtitle.Render(m.steps[m.currentStep]) + "\n"
+		s += styles.Text.Render(m.steps[m.currentStep]) + "\n"
 	}
 
 	if m.currentStep == 0 {
-		s += m.textInput.View() + "\n"
+		s += styles.TextInput.Render(m.textInput.View()) + "\n"
 	}
 	if m.currentStep == 1 {
 		for i, c := range m.locationChoices {
 			cursor := " "
+			t := ""
 			if m.cursor == i {
-				cursor = ">"
+				cursor = "•"
+				t = styles.SelectedOption.Render(c.Describe())
+			} else {
+				t = c.Describe()
 			}
-			s += fmt.Sprintf("%s %s\n", cursor, c.Describe())
+			s += fmt.Sprintf("%s %s\n", cursor, t)
 		}
 	}
 	if m.currentStep == 2 {
 		for i, u := range m.unitChoices {
+			t := ""
 			cursor := " "
 			if m.cursor == i {
-				cursor = ">"
+				cursor = "•"
+				t = styles.SelectedOption.Render(string(u))
+			} else {
+				t = string(u)
 			}
-			s += fmt.Sprintf("%s %s\n", cursor, u)
+			s += fmt.Sprintf("%s %s\n", cursor, t)
 		}
 
 	}
 	if m.currentStep != 3 && m.currentStep != 4 {
-		s += instructions
+		s += styles.Subtitle.Render(instructions)
 	}
 	if m.currentStep == 1 || m.currentStep == 2 {
-		s += fmt.Sprintf(", %s", additionalInstruction)
+		s += styles.Subtitle.Render(additionalInstruction)
 	}
 
 	return s
