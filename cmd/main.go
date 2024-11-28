@@ -40,13 +40,14 @@ func main() {
 	userSettings, err := settings.GetUserSettings()
 
 	if err != nil || mode == app_mode.ChangePreferences {
-		fmt.Println("Welcome to GO Cast!")
 
-		userSettings, err = settings.InterviewUser()
+		userSettings, status, err := settings.InterviewUser()
 		if err != nil {
 			log.Fatal("Could not get your preferences...")
 		}
-
+		if status == settings.Canceled {
+			os.Exit(0)
+		}
 		err = settings.SaveUserSettings(userSettings)
 		if err != nil {
 			log.Fatal("Could not save the preferences...")

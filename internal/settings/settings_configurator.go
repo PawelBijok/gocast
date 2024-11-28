@@ -2,11 +2,11 @@ package settings
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pafello/gocast/internal/geolocation"
+	"github.com/pafello/gocast/internal/styles"
 	"github.com/pafello/gocast/internal/units"
 )
 
@@ -29,7 +29,7 @@ func initialModel() interviewModel {
 	return interviewModel{
 		currentStep:      0,
 		textInput:        li,
-		steps:            map[int]string{0: "What is your location", 1: "Select correct location", 2: "Select unit system"},
+		steps:            map[int]string{0: "What is your location", 1: "Select correct location", 2: "Select unit system", 3: "", 4: "Not now? Sure, come back when you are ready :)"},
 		locationChoices:  []geolocation.GeolocationResult{},
 		selectedLocation: geolocation.GeolocationResult{},
 		unitChoices:      []units.UnitSystem{units.Metric, units.Imperial},
@@ -38,7 +38,7 @@ func initialModel() interviewModel {
 	}
 }
 func (m interviewModel) Init() tea.Cmd {
-	return textinput.Blink
+	return tea.ClearScreen
 }
 
 func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -50,6 +50,7 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.currentStep == 0 {
 			switch msg.String() {
 			case "esc", "ctrl+c":
+				m.currentStep = 4
 				return m, tea.Quit
 
 			case "enter":
@@ -94,6 +95,7 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.currentStep == 2 {
 			switch msg.String() {
 			case "esc", "ctrl+c":
+				m.currentStep = 4
 				return m, tea.Quit
 
 			case "up", "k":
@@ -109,6 +111,7 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "enter":
 				m.selectedUnit = m.unitChoices[m.cursor]
 				m.cursor = 0
+				m.currentStep++
 				cmd = tea.Quit
 			}
 			return m, cmd
@@ -119,10 +122,16 @@ func (m interviewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m interviewModel) View() string {
-	// The header
 	instructions := "(esc) quit, (enter) select"
 	additionalInstruction := "(↑/↓) navigate"
-	s := m.steps[m.currentStep] + "\n"
+	s := ""
+
+	if m.currentStep == 0 {
+		s += styles.HeaderBox.Render("Welcome to Go Cast!") + "\n"
+	}
+	if len(m.steps[m.currentStep]) > 0 {
+		s += styles.Subtitle.Render(m.steps[m.currentStep]) + "\n"
+	}
 
 	if m.currentStep == 0 {
 		s += m.textInput.View() + "\n"
@@ -146,24 +155,36 @@ func (m interviewModel) View() string {
 		}
 
 	}
-
-	s += instructions
-	if m.currentStep != 0 {
+	if m.currentStep != 3 && m.currentStep != 4 {
+		s += instructions
+	}
+	if m.currentStep == 1 || m.currentStep == 2 {
 		s += fmt.Sprintf(", %s", additionalInstruction)
 	}
 
 	return s
 }
 
-func InterviewUser() (UserSettings, error) {
+type Status int
+
+const (
+	Success Status = iota
+	Canceled
+)
+
+func InterviewUser() (UserSettings, Status, error) {
 
 	p := tea.NewProgram(initialModel())
-	m, err := p.Run()
+	data, err := p.Run()
 
-	model := m.(interviewModel)
+	model := data.(interviewModel)
 
 	if err != nil {
-		os.Exit(1)
+		return UserSettings{}, Canceled, err
+	}
+
+	if model.currentStep != 3 {
+		return UserSettings{}, Canceled, nil
 	}
 
 	userSettings := UserSettings{
@@ -171,6 +192,6 @@ func InterviewUser() (UserSettings, error) {
 		UnitSys:  model.selectedUnit,
 	}
 
-	return userSettings, nil
+	return userSettings, Success, nil
 
 }
