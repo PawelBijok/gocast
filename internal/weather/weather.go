@@ -3,7 +3,11 @@ package weather
 import (
 	"fmt"
 
+	"github.com/pafello/gocast/internal/styles"
 	"github.com/pafello/gocast/internal/units"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/pafello/gocast/internal/utils"
 )
 
@@ -57,7 +61,7 @@ func (w *AvgDayWeather) DescribeShort() string {
 
 type WeatherSeries []*Weather
 
-func (w *Weather) Describe(cityName string) string {
+func (w *Weather) Describe() string {
 	tempUnit := w.UnitSystemUsed.GetTempUnit()
 
 	descriptions := ""
@@ -68,11 +72,12 @@ func (w *Weather) Describe(cityName string) string {
 		}
 		descriptions += d.Description + ending
 	}
-	return fmt.Sprintf("%s: %g %s (%g %s), %s", cityName, w.Core.Temp, tempUnit, w.Core.TempFeelsLike, tempUnit, descriptions)
+	return fmt.Sprintf("%g %s (%g %s), %s", w.Core.Temp, tempUnit, w.Core.TempFeelsLike, tempUnit, descriptions)
 
 }
 
 func (w *Weather) DescribeShort() string {
+
 	tempUnit := w.UnitSystemUsed.GetTempUnit()
 	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
 	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
@@ -84,11 +89,54 @@ func (w *Weather) DescribeShort() string {
 
 }
 
-func (w *Weather) DescribeDetails() string {
+func (w *Weather) DisplayDetails() {
+	descriptions := ""
+	for i, d := range w.Description {
+		ending := ""
+		if i != len(w.Description)-1 {
+			ending = ","
+		}
+		descriptions += d.Description + ending
+	}
+	tempUnit := w.UnitSystemUsed.GetTempUnit()
 	speedUnit := w.UnitSystemUsed.GetSpeedUnit()
 	pressureUnit := w.UnitSystemUsed.GetPressureUnit()
 
-	return fmt.Sprintf("Humidity: %g%s | Pressure: %g %s | Wind speed: %g %s", w.Core.Humidity, "%", w.Core.Pressure, pressureUnit, w.Wind.Speed, speedUnit)
+	rows := [][]string{
+
+		{"Feels like", fmt.Sprintf("%.2f %s", w.Core.TempFeelsLike, tempUnit)},
+		{"State", descriptions},
+		{"Humidity", fmt.Sprintf("%g%s", w.Core.Humidity, "%")},
+		{"Pressure", fmt.Sprintf("%g %s", w.Core.Pressure, pressureUnit)},
+		{"Wind speed", fmt.Sprintf("%g %s", w.Wind.Speed, speedUnit)},
+	}
+
+	t := table.New().
+		Border(lipgloss.RoundedBorder()).
+		BorderStyle(styles.TableBorder).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			switch {
+			case row == 0:
+
+				return styles.TableHeader
+			case row%2 == 0:
+				if col == 0 {
+					return styles.TableRowEven.Padding(0, 1, 0, 1).Align(lipgloss.Right)
+				}
+				return styles.TableRowEven.Padding(0, 1, 0, 1).Align(lipgloss.Left)
+			default:
+				if col == 0 {
+					return styles.TableRowOdd.Padding(0, 1, 0, 1).Align(lipgloss.Right)
+				}
+				return styles.TableRowOdd.Padding(0, 1, 0, 1).Align(lipgloss.Left)
+			}
+		}).
+		Headers("Temp", fmt.Sprintf("%.2f %s", w.Core.Temp, tempUnit)).
+		BorderBottom(true).
+		BorderRow(false).
+		Rows(rows...)
+
+	fmt.Println(t)
 
 }
 

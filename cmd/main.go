@@ -83,8 +83,7 @@ func main() {
 			fmt.Println("Could not read the weather:", err)
 			return
 		}
-
-		fmt.Println(weather.Describe(userSettings.Location.Name))
-		fmt.Println(weather.DescribeDetails())
+		fmt.Println(styles.HeaderText.Render(userSettings.Location.DisplayDescribe()))
+		weather.DisplayDetails()
 	}
 }
